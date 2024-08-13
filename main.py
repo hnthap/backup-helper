@@ -1,24 +1,14 @@
-import json
-import time
-
-from backup_helper import new_backup, parse_arguments
+from backup_helper import get_today_string, load_time_log, new_backup, parse_arguments, save_time_log
 
 
 def main():
     outdir, directories, password = parse_arguments()
+    log_path = outdir / 'log.json'
+    log = load_time_log(log_path)
     for directory in directories:
+        log[str(directory.absolute())] = get_today_string()
         new_backup(outdir, directory, password)
-    now_unix_secs = time.time()
-    now_local = time.localtime(now_unix_secs)
-    info = {
-        'compressing_local_time': {
-            'year': now_local[0],
-            'month': now_local[1],
-            'month_day': now_local[2],
-        },
-    } 
-    with open(outdir / 'info.json', 'w', encoding='utf-8') as f:
-        json.dump(info, f, ensure_ascii=False, indent=4)
+    save_time_log(log, log_path)
 
 
 if __name__ == '__main__':

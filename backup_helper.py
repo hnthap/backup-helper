@@ -1,7 +1,9 @@
 import argparse
+import json
 from pathlib import Path
 import subprocess
-from typing import Union
+import time
+from typing import Dict, Union
 
 
 def extract_arguments():
@@ -17,18 +19,36 @@ def extract_arguments():
     return args
 
 
+def get_today_string():
+    now = time.time()
+    now_local = time.localtime(now)
+    now_string = time.strftime('%Y-%m-%d', now_local)
+    return now_string
+
+
+def load_time_log(log_path: Path, not_exists_ok = True) -> Dict[str, str]:
+    if log_path.exists():
+        with open(log_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    if not_exists_ok:
+        return {}
+    raise FileExistsError(log_path)
+
+
 def new_backup(outdir: Path, directory: Path, password: Union[str, None]):
     print('\033[92m[INFO] Compressing {}\033[0m'.format(directory))
     out_name = directory.name
     out_path = outdir / '{}.7z'.format(out_name)
-    subprocess.run([
+    parts = [
         '7z', 
         'a', 
         out_path, 
         directory / '*', 
-        '-p' if password is None else '-p{}'.format(password), 
         '-mhe=on'
-    ])
+    ]
+    if password is not None:
+        parts.append('-p{}'.format(password))
+    subprocess.run(parts)
 
 
 def parse_arguments():
@@ -50,4 +70,9 @@ def parse_arg_outdir(args: argparse.Namespace):
     if not outdir.exists():
         outdir.mkdir()
     return outdir
+
+
+def save_time_log(log: Dict[str, str], log_path: Path):
+    with open(log_path, 'w', encoding='utf-8') as f:
+        json.dump(log, f, ensure_ascii=False, indent=4)
 
