@@ -35,8 +35,8 @@ Result:
     |     └─── ...
     └─── backup
           ├─── log.json
-          ├─── fold
-          └─── folder2.7z
+          ├─── homework.7z
+          └─── practice.7z
 ```
 
 The compressed files in `backup` would be opened with the password `ThisIsSomePassword!!`, as specified in this example. That password can be replaced with anything you want.
