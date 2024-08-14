@@ -15,6 +15,7 @@ def extract_arguments():
     parser.add_argument('directories', nargs='+')
     parser.add_argument('-o', '--outdir')
     parser.add_argument('-p', '--password')
+    parser.add_argument('-s', '--nosamedate', action='store_true')
     args = parser.parse_args()
     return args
 
@@ -56,7 +57,8 @@ def parse_arguments():
     outdir = parse_arg_outdir(args)
     directories = parse_arg_directories(args)
     password = args.password
-    return outdir, directories, password
+    no_same_date = args.nosamedate
+    return outdir, directories, password, no_same_date
 
 
 def parse_arg_directories(args: argparse.Namespace):
